@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConnectClient.ActiveDirectory\ConnectClient.ActiveDirectory.csproj" />
+    <ProjectReference Include="..\ConnectClient.Models\ConnectClient.Models.csproj" />
+    <ProjectReference Include="..\ConnectClient.Rest\ConnectClient.Rest.csproj" />
+  </ItemGroup>
+
+</Project>
