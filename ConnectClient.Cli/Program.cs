@@ -19,6 +19,9 @@ namespace ConnectClient.Cli
             var result = parser.ParseArguments<Options>(args);
 
             await result.MapResult(async options => await Run(options), _ => Task.FromResult(1));
+
+            Console.WriteLine("Press any key to close this window...");
+            Console.ReadLine();
         }
 
         static async Task Run(Options options)

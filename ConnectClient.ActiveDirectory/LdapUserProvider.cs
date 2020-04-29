@@ -107,10 +107,12 @@ namespace ConnectClient.ActiveDirectory
                 catch (LdapException e)
                 {
                     logger.LogError(e, "LDAP error.");
+                    list = null;
                 }
                 catch (Exception e)
                 {
                     logger.LogError(e, "Non-LDAP error.");
+                    list = null;
                 }
 
                 // Needed to prevent Dispose() from an infinite call, see https://github.com/dsbenghe/Novell.Directory.Ldap.NETStandard/issues/101
