@@ -4,6 +4,12 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <Authors>Marcel Marnitz</Authors>
+    <Company>SchulIT</Company>
+    <Product>Active Directory Connect Client</Product>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageProjectUrl>https://github.com/schulit/adconnect-client</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +26,10 @@
   <ItemGroup>
     <None Update="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 
