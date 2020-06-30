@@ -9,7 +9,7 @@ vorab provisioniert. Dies ermöglicht es, Benutzer zu bearbeiten bevor sie sich 
 
 ## Installation
 
-Das aktuellste Installationspaket lässt sich [hier](/releases) herunterladen. Der Client benötigt keine
+Das aktuellste Installationspaket lässt sich [hier](https://github.com/schulit/adconnect-client//releases) herunterladen. Der Client benötigt keine
 weiteren Abhängigkeiten (.NET Core 3.1 wird mit der Software mitgeliefert). 
 
 Das Tool ist auf allen Windows-Betriebssystemen lauffähig, auf denen auch .NET Core 3.1 lauffähig ist. 
@@ -25,7 +25,7 @@ Das Aktualisieren des Clients ist unkompliziert. Einfach die neueste Version des
 
 ## Probleme?
 
-Dann bitte in den [Issue schauen](https://github.com/SchulIT/anonymization-tool/issues), ob das Problem bereits bekannt ist. Falls nicht, kann dort ein Issue geöffnet werden. Support via E-Mail wird nicht angeboten.
+Dann bitte in den [Issue schauen](https://github.com/schulit/adconnect-client/issues), ob das Problem bereits bekannt ist. Falls nicht, kann dort ein Issue geöffnet werden. Support via E-Mail wird nicht angeboten.
 
 ## Lizenz
 
