@@ -10,6 +10,7 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <RepositoryUrl></RepositoryUrl>
     <PackageProjectUrl>https://github.com/schulit/adconnect-client</PackageProjectUrl>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
