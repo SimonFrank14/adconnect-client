@@ -61,7 +61,7 @@ stages:
     - task: CmdLine@2
       displayName: Copy and rename MSI
       inputs:
-        script: copy AuthServer.Installer\bin\$(buildPlatform)\Release\ConnectClient.Installer.msi output\setup-$(Build.SourceBranchName).msi
+        script: copy ConnectClient.Installer\bin\$(buildPlatform)\Release\ConnectClient.Installer.msi output\setup-$(Build.SourceBranchName).msi
       condition: succeeded()
 
     - task: PublishPipelineArtifact@1
