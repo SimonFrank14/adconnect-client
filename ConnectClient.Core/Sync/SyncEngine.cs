@@ -1,4 +1,5 @@
 ﻿using ConnectClient.ActiveDirectory;
+using ConnectClient.Core.Settings;
 using ConnectClient.Models.Response;
 using ConnectClient.Rest;
 using Microsoft.Extensions.Logging;
@@ -12,16 +13,14 @@ namespace ConnectClient.Core.Sync
 {
     public class SyncEngine : ISyncEngine
     {
-        private readonly string uniqueIdAttributeName;
-        private readonly string[] organizationalUnits;
+        private readonly SettingsManager settingsManager;
         private readonly ILdapUserProvider ldapUserProvider;
         private readonly IClient client;
         private readonly ILogger<SyncEngine> logger;
 
-        public SyncEngine(string uniqueIdAttributeName, string[] organizationalUnits, ILdapUserProvider ldapUserProvider, IClient client, ILogger<SyncEngine> logger)
+        public SyncEngine(SettingsManager settingsManager, ILdapUserProvider ldapUserProvider, IClient client, ILogger<SyncEngine> logger)
         {
-            this.uniqueIdAttributeName = uniqueIdAttributeName;
-            this.organizationalUnits = organizationalUnits;
+            this.settingsManager = settingsManager;
             this.ldapUserProvider = ldapUserProvider;
             this.client = client;
             this.logger = logger;
@@ -31,6 +30,7 @@ namespace ConnectClient.Core.Sync
         {
             try
             {
+                var settings = settingsManager.GetSettings();
                 var lastSync = await GetLastSyncDateTimeAsync();
                 logger.LogInformation("Start synchronization.");
                 logger.LogInformation($"Last sync: {(lastSync == null ? "never" : lastSync.ToString())}");
@@ -51,7 +51,7 @@ namespace ConnectClient.Core.Sync
 
                 logger.LogInformation("Fetching current user base...");
 
-                var response = await client.GetUsersAsync();
+                var response = await client.GetUsersAsync(settings.Endpoint);
                 var userListResponse = response as ListActiveDirectoryUserResponse;
 
                 if (userListResponse == null)
@@ -65,7 +65,7 @@ namespace ConnectClient.Core.Sync
                 logger.LogInformation($"Got {cloudUserGuids.Length} user(s).");
 
                 logger.LogInformation("Searching Active Directory...");
-                var ldapUsers = await Task.Run(() => ldapUserProvider.GetUsers(organizationalUnits, uniqueIdAttributeName));
+                var ldapUsers = await Task.Run(() => ldapUserProvider.GetUsers(settings.OrganizationalUnits, settings.UniqueIdAttributeName, settings.Ldap));
 
                 if(ldapUsers == null)
                 {
@@ -112,7 +112,7 @@ namespace ConnectClient.Core.Sync
                     if (IsValidUser(user))
                     {
                         logger.LogDebug($"Adding user {user.Guid}...");
-                        await client.AddUserAsync(user);
+                        await client.AddUserAsync(user, settings.Endpoint);
                         logger.LogDebug("Done.");
                     }
                     else
@@ -134,7 +134,7 @@ namespace ConnectClient.Core.Sync
                     else
                     {
                         logger.LogDebug($"Updating user {user.Guid}...");
-                        await client.UpdateUserAsync(user);
+                        await client.UpdateUserAsync(user, settings.Endpoint);
                         logger.LogDebug("Done.");
                     }
                 }
@@ -147,7 +147,7 @@ namespace ConnectClient.Core.Sync
                 foreach (var guid in remove)
                 {
                     logger.LogDebug($"Removing user {guid}...");
-                    await client.RemoveUserAsync(guid);
+                    await client.RemoveUserAsync(guid, settings.Endpoint);
                     logger.LogDebug("Done.");
                 }
 

@@ -1,18 +1,32 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
 
 namespace ConnectClient.Core.Settings
 {
-    public static class SettingsManager
+    public class SettingsManager
     {
+        private JsonSettings settings;
+
         public static string GetPath()
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "SchulIT", "AD Connect Client", "settings.json");
         }
 
-        public static JsonSettings LoadSettings()
+        public JsonSettings GetSettings()
+        {
+            return settings;
+        }
+
+        public void SaveSettings()
+        {
+            var file = GetPath();
+
+            using var writer = new StreamWriter(file);
+            writer.Write(JsonConvert.SerializeObject(settings, Formatting.Indented));
+        }
+
+        public void LoadSettings()
         {
             var file = GetPath();
 
@@ -24,9 +38,7 @@ namespace ConnectClient.Core.Settings
 
             using var reader = new StreamReader(file);
             var settings = reader.ReadToEnd();
-            var settingsObj = JsonConvert.DeserializeObject<JsonSettings>(settings);
-
-            return settingsObj;
+            this.settings = JsonConvert.DeserializeObject<JsonSettings>(settings);
         }
     }
 }

@@ -4,6 +4,6 @@ namespace ConnectClient.ActiveDirectory
 {
     public interface ILdapUserProvider
     {
-        List<User> GetUsers(IEnumerable<string> organizationalUnits, string uniqueIdAttributeName);
+        List<User> GetUsers(IEnumerable<string> organizationalUnits, string uniqueIdAttributeName, LdapSettings settings);
     }
 }

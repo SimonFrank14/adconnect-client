@@ -17,16 +17,14 @@ namespace ConnectClient.Rest
 
         private const string Endpoint = "/api/ad_connect";
 
-        private readonly EndpointSettings settings;
         private readonly ILogger<Client> logger;
 
-        public Client(EndpointSettings settings, ILogger<Client> logger)
+        public Client(ILogger<Client> logger)
         {
-            this.settings = settings;
             this.logger = logger;
         }
 
-        private async Task<IResponse> SendAsync<T>(IRequest request, Func<HttpClient, StringContent, Task<HttpResponseMessage>> action)
+        private async Task<IResponse> SendAsync<T>(IRequest request, Func<HttpClient, StringContent, Task<HttpResponseMessage>> action, EndpointSettings settings)
             where T : IResponse
         {
             using (var client = new HttpClient())
@@ -75,17 +73,17 @@ namespace ConnectClient.Rest
             return null;
         }
 
-        public Task<IResponse> AddUserAsync(User user)
+        public Task<IResponse> AddUserAsync(User user, EndpointSettings settings)
         {
-            return SendAsync<ListActiveDirectoryUserResponse>(ToActiveDirectoryUser(user), (client, content) => client.PostAsync(Endpoint, content));
+            return SendAsync<ListActiveDirectoryUserResponse>(ToActiveDirectoryUser(user), (client, content) => client.PostAsync(Endpoint, content), settings);
         }
 
-        public Task<IResponse> GetUsersAsync()
+        public Task<IResponse> GetUsersAsync(EndpointSettings settings)
         {
-            return SendAsync<ListActiveDirectoryUserResponse>(null, (client, content) => client.GetAsync(Endpoint));
+            return SendAsync<ListActiveDirectoryUserResponse>(null, (client, content) => client.GetAsync(Endpoint), settings);
         }
 
-        public Task<IResponse> RemoveUserAsync(string guid)
+        public Task<IResponse> RemoveUserAsync(string guid, EndpointSettings settings)
         {
             if(string.IsNullOrEmpty(guid))
             {
@@ -93,14 +91,14 @@ namespace ConnectClient.Rest
             }
 
             var endpoint = Endpoint.TrimEnd('/') + "/" + guid;
-            return SendAsync<ListActiveDirectoryUserResponse>(null, (client, content) => client.DeleteAsync(endpoint));
+            return SendAsync<ListActiveDirectoryUserResponse>(null, (client, content) => client.DeleteAsync(endpoint), settings);
         }
 
-        public Task<IResponse> UpdateUserAsync(User user)
+        public Task<IResponse> UpdateUserAsync(User user, EndpointSettings settings)
         {
             CheckUserAndThrowIfInvalid(user);
             var endpoint = Endpoint.TrimEnd('/') + "/" + user.Guid;
-            return SendAsync<ListActiveDirectoryUserResponse>(ToActiveDirectoryUser(user), (client, content) => client.PatchAsync(endpoint, content));
+            return SendAsync<ListActiveDirectoryUserResponse>(ToActiveDirectoryUser(user), (client, content) => client.PatchAsync(endpoint, content), settings);
         }
 
         private void CheckUserAndThrowIfInvalid(User user)

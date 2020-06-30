@@ -26,16 +26,13 @@ namespace ConnectClient.Cli
 
         static async Task Run(Options options)
         {
-            var settings = SettingsManager.LoadSettings();
-
             var builder = new ContainerBuilder();
-            builder.Register(x => settings.Endpoint).As<EndpointSettings>();
-            builder.Register(x => settings.Ldap).As<LdapSettings>();
+            builder.RegisterType<SettingsManager>().AsSelf().SingleInstance();
 
             builder.RegisterType<Client>().As<IClient>().SingleInstance();
             builder.RegisterType<LdapUserProvider>().As<ILdapUserProvider>().SingleInstance();
 
-            builder.Register((c, p) => new SyncEngine(settings.UniqueIdAttributeName, settings.OrganizationalUnits, c.Resolve<ILdapUserProvider>(), c.Resolve<IClient>(), c.Resolve<ILogger<SyncEngine>>())).As<ISyncEngine>().SingleInstance();
+            builder.RegisterType<SyncEngine>().As<ISyncEngine>().SingleInstance();
 
             builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>));
             builder.RegisterType<NLogLoggerFactory>().AsImplementedInterfaces().InstancePerLifetimeScope();

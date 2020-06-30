@@ -25,17 +25,14 @@ namespace ConnectClient.ActiveDirectory
 
         private const string SearchFilter = "(objectclass=user)";
 
-
-        private readonly LdapSettings settings;
         private readonly ILogger<LdapUserProvider> logger;
 
-        public LdapUserProvider(LdapSettings settings, ILogger<LdapUserProvider> logger)
+        public LdapUserProvider(ILogger<LdapUserProvider> logger)
         {
-            this.settings = settings;
             this.logger = logger;
         }
 
-        public List<User> GetUsers(IEnumerable<string> organizationalUnits, string uniqueIdAttributeName)
+        public List<User> GetUsers(IEnumerable<string> organizationalUnits, string uniqueIdAttributeName, LdapSettings settings)
         {
             var list = new List<User>();
 
@@ -43,7 +40,7 @@ namespace ConnectClient.ActiveDirectory
             {
                 try
                 {
-                    ConnectLdapConnection(ldapConnection);
+                    ConnectLdapConnection(ldapConnection, settings);
                     ldapConnection.Bind(settings.Username, settings.Password);
 
                     var attributes = new List<string>() { LastModifiedAttribute, UserPrincipalNameAttribute, MemberOfAttribute, EmailAttribute, DisplayNameAttribute, FirstnameAttribute, LastnameAttribute, UsernameAttribute, AccountControlAttribute, GuidAttribute };
@@ -125,9 +122,20 @@ namespace ConnectClient.ActiveDirectory
             return list;
         }
 
-        private void ConnectLdapConnection(LdapConnection ldapConnection)
+        private void ConnectLdapConnection(LdapConnection ldapConnection, LdapSettings settings)
         {
-            ldapConnection.UserDefinedServerCertValidationDelegate += CheckCertificateCallback;
+            ldapConnection.UserDefinedServerCertValidationDelegate += (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
+            {
+                foreach (var cert in chain.ChainElements)
+                {
+                    if (cert.Certificate.Thumbprint.ToLower() == settings.CertificateThumbprint.ToLower())
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            };
 
             /**
              * CONFIGURE SSL
@@ -151,19 +159,6 @@ namespace ConnectClient.ActiveDirectory
                 logger.LogDebug("Starting TLS session.");
                 ldapConnection.StartTls();
             }
-        }
-
-        private bool CheckCertificateCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            foreach (var cert in chain.ChainElements)
-            {
-                if (cert.Certificate.Thumbprint.ToLower() == settings.CertificateThumbprint.ToLower())
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private string GetOU(string dn)
