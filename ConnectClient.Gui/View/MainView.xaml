@@ -352,6 +352,9 @@
                         </fluent:Button.LargeIcon>
                     </fluent:Button>
                 </fluent:RibbonGroupBox>
+                <fluent:RibbonGroupBox Header="Optionen">
+                    <fluent:CheckBox x:Name="checkEnableDebugOutput">Erweitere Ausgabe aktivieren</fluent:CheckBox>
+                </fluent:RibbonGroupBox>
             </fluent:RibbonTabItem>
         </fluent:Ribbon>
 

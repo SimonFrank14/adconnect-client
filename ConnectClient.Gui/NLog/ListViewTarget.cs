@@ -11,7 +11,9 @@ namespace ConnectClient.Gui.NLog
     [Target("ListView")]
     public class ListViewTarget : TargetWithLayout
     {
-        private object lockObject = new object();
+        private readonly object lockObject = new object();
+
+        public bool EnableDebugOutput = false;
 
         public ObservableCollection<LogEventInfo> Events { get; } = new ObservableCollection<LogEventInfo>();
 
@@ -22,6 +24,11 @@ namespace ConnectClient.Gui.NLog
 
         protected override void Write(LogEventInfo logEvent)
         {
+            if (logEvent.Level == LogLevel.Debug && EnableDebugOutput == false)
+            {
+                return;
+            }
+
             lock (lockObject)
             {
                 Events.Add(logEvent);
