@@ -111,13 +111,23 @@ namespace ConnectClient.Core.Sync
                 {
                     if (IsValidUser(user))
                     {
-                        logger.LogDebug($"Adding user {user.Guid}...");
-                        await client.AddUserAsync(user, settings.Endpoint);
+                        logger.LogDebug($"Adding user {user.UPN}...");
+                        var addResponse = await client.AddUserAsync(user, settings.Endpoint);
+
+                        if (addResponse is ViolationListResponse)
+                        {
+                            LogViolationListResponse(user.UPN, addResponse as ViolationListResponse);
+                        }
+                        else if (addResponse is ErrorResponse)
+                        {
+                            LogErrorResponse(user.UPN, addResponse as ErrorResponse);
+                        }
+
                         logger.LogDebug("Done.");
                     }
                     else
                     {
-                        logger.LogDebug($"Skipping invalid user {user.Guid}.");
+                        logger.LogDebug($"Skipping invalid user {user.UPN}.");
                         addSkiped.Add(user);
                     }
                 }
@@ -133,8 +143,18 @@ namespace ConnectClient.Core.Sync
                     }
                     else
                     {
-                        logger.LogDebug($"Updating user {user.Guid}...");
-                        await client.UpdateUserAsync(user, settings.Endpoint);
+                        logger.LogDebug($"Updating user {user.UPN}...");
+                        var updateResponse = await client.UpdateUserAsync(user, settings.Endpoint);
+
+                        if (updateResponse is ViolationListResponse)
+                        {
+                            LogViolationListResponse(user.UPN, updateResponse as ViolationListResponse);
+                        }
+                        else if (updateResponse is ErrorResponse)
+                        {
+                            LogErrorResponse(user.UPN, updateResponse as ErrorResponse);
+                        }
+
                         logger.LogDebug("Done.");
                     }
                 }
@@ -147,7 +167,13 @@ namespace ConnectClient.Core.Sync
                 foreach (var guid in remove)
                 {
                     logger.LogDebug($"Removing user {guid}...");
-                    await client.RemoveUserAsync(guid, settings.Endpoint);
+                    var removeResponse = await client.RemoveUserAsync(guid, settings.Endpoint);
+
+                    if (removeResponse is ErrorResponse)
+                    {
+                        LogErrorResponse(guid, removeResponse as ErrorResponse);
+                    }
+
                     logger.LogDebug("Done.");
                 }
 
@@ -198,6 +224,23 @@ namespace ConnectClient.Core.Sync
                 && !string.IsNullOrEmpty(user.Lastname)
                 && !string.IsNullOrEmpty(user.Email)
                 && !string.IsNullOrEmpty(user.OU);
+        }
+
+        private void LogErrorResponse(string objective, ErrorResponse response)
+        {
+            logger.LogError($"Error ({objective}): {response.Message}");
+        }
+
+        private void LogViolationListResponse(string objective, ViolationListResponse response)
+        {
+            var violationList = response.Violations;
+
+            LogErrorResponse(objective, response);
+
+            foreach (var violation in violationList)
+            {
+                logger.LogError($"Violation ({violation.Property}): {violation.Message}");
+            }
         }
     }
 }
