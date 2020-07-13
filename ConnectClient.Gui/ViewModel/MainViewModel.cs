@@ -14,7 +14,11 @@ namespace ConnectClient.Gui.ViewModel
         public bool IsBusy
         {
             get { return isBusy; }
-            set { Set(() => IsBusy, ref isBusy, value); }
+            set
+            {
+                Set(() => IsBusy, ref isBusy, value);
+                SyncCommand?.RaiseCanExecuteChanged();
+            }
         }
 
         private bool fullSync;
@@ -44,7 +48,12 @@ namespace ConnectClient.Gui.ViewModel
         {
             this.syncEngine = syncEngine;
 
-            SyncCommand = new RelayCommand(Sync);
+            SyncCommand = new RelayCommand(Sync, CanSync);
+        }
+
+        private bool CanSync()
+        {
+            return !IsBusy;
         }
 
         private async void Sync()
@@ -60,7 +69,7 @@ namespace ConnectClient.Gui.ViewModel
             }
             finally
             {
-                IsBusy = true;
+                IsBusy = false;
             }
         }
     }
