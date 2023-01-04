@@ -1,11 +1,9 @@
 ﻿using Autofac;
 using ConnectClient.ActiveDirectory;
 using ConnectClient.Core.Settings;
-using ConnectClient.Core.Sync;
+using ConnectClient.Gui.UI;
 using ConnectClient.Rest;
-using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,12 +27,7 @@ namespace ConnectClient.Gui.ViewModel
             builder.RegisterType<Client>().As<IClient>().SingleInstance();
             builder.RegisterType<LdapUserProvider>().As<ILdapUserProvider>().SingleInstance();
 
-            builder.RegisterType<SyncEngine>().As<ISyncEngine>().SingleInstance();
-
-            builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>));
-            builder.RegisterType<NLogLoggerFactory>().AsImplementedInterfaces().InstancePerLifetimeScope();
-
-            builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
+            builder.RegisterType<DialogHelper>().As<IDialogHelper>().SingleInstance();
 
             builder.RegisterType<MainViewModel>().AsSelf().SingleInstance();
             builder.RegisterType<SettingsViewModel>().AsSelf().SingleInstance().OnActivated(x => x.Instance.LoadSettings());
@@ -42,8 +35,6 @@ namespace ConnectClient.Gui.ViewModel
 
             container = builder.Build();
         }
-
-        public IMessenger Messenger { get { return container.Resolve<IMessenger>(); } }
 
         public MainViewModel Main { get { return container.Resolve<MainViewModel>(); } }
 

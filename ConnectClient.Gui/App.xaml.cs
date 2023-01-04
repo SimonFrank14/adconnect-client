@@ -1,6 +1,6 @@
-﻿using ConnectClient.Gui.NLog;
-using NLog.Targets;
+﻿using ModernWpf;
 using System.Windows;
+using System.Windows.Media;
 
 namespace ConnectClient.Gui
 {
@@ -8,7 +8,7 @@ namespace ConnectClient.Gui
     {
         public App()
         {
-            Target.Register<ListViewTarget>("ListView");
+            ThemeManager.Current.AccentColor = (Color)ColorConverter.ConvertFromString("#0078D7");
         }
     }
 }

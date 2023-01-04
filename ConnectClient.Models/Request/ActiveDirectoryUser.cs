@@ -25,9 +25,6 @@ namespace ConnectClient.Models.Request
         [JsonProperty("ou")]
         public string Ou { get; set; }
 
-        [JsonProperty("unique_id")]
-        public string UniqueId { get; set; }
-
         [JsonProperty("groups")]
         public string[] Groups { get; set; }
     }

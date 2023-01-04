@@ -1,117 +1,40 @@
-﻿using ConnectClient.Gui.Message;
-using ConnectClient.Gui.NLog;
-using ConnectClient.Gui.ViewModel;
-using Fluent;
-using KPreisser.UI;
-using NLog;
-using System.Diagnostics;
+﻿using ModernWpf.Controls;
 using System.Linq;
 using System.Windows;
-using System.Windows.Interop;
 
 namespace ConnectClient.Gui.View
 {
-    public partial class MainView : RibbonWindow
+    /// <summary>
+    /// Interaktionslogik für MainView.xaml
+    /// </summary>
+    public partial class MainView : Window
     {
         public MainView()
         {
             InitializeComponent();
+            navigationView.SelectedItem = navigationView.MenuItems.OfType<NavigationViewItem>().First();
+        }
 
-            var config = LogManager.Configuration;
-            var target = config.AllTargets.FirstOrDefault(x => x is ListViewTarget) as ListViewTarget;
-
-            if (target != null)
+        private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        {
+            var selectedItem = args.SelectedItem as NavigationViewItem;
+            if (selectedItem == null)
             {
-                loggerListView.ItemsSource = target.Events;
-
-                target.Events.CollectionChanged += (s, e) =>
-                {
-                    // Hack to always scroll to bottom
-                    if (target.Events.Count > 0)
-                    {
-                        loggerListView.ScrollIntoView(target.Events[target.Events.Count - 1]);
-                    }
-                };
-
-                checkEnableDebugOutput.Checked += delegate
-                {
-                    target.EnableDebugOutput = true;
-                };
-                checkEnableDebugOutput.Unchecked += delegate
-                {
-                    target.EnableDebugOutput = false;
-                };
-            }
-            else
-            {
-                MessageBox.Show("nlog.config Fehler - es werden keine Logging-Informationen angezeigt.");
+                return;
             }
 
-            Loaded += OnLoaded;
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            var locator = App.Current.Resources["ViewModelLocator"] as ViewModelLocator;
-
-            var messenger = locator.Messenger;
-            messenger.Register<DialogMessage>(this, OnDialogMessage);
-            messenger.Register<ErrorDialogMessage>(this, OnErrorDialogMessage);
-        }
-
-        private void OnDialogMessage(DialogMessage msg)
-        {
-            var page = new TaskDialogPage
+            var targetPage = selectedItem.Tag switch
             {
-                Title = msg.Title,
-                Text = msg.Text,
-                Instruction = msg.Header,
-                Icon = TaskDialogStandardIcon.Information
+                "provision" => typeof(ProvisionPage),
+                "remove" => typeof(RemovePage),
+                "settings" => typeof(SettingsPage),
+                "about" => typeof(AboutPage),
+                _ => null
             };
 
-            var dialog = new TaskDialog(page);
-            dialog.Show(new WindowInteropHelper(this).Handle);
-        }
-
-        private void OnErrorDialogMessage(ErrorDialogMessage msg)
-        {
-            var page = new TaskDialogPage
+            if(targetPage != null)
             {
-                Title = msg.Title,
-                Text = msg.Text,
-                Instruction = msg.Header,
-                Icon = TaskDialogStandardIcon.Error,
-                Expander =
-                {
-                    Text = msg.Exception.Message,
-                    ExpandFooterArea = true
-                }
-            };
-
-            var dialog = new TaskDialog(page);
-            dialog.Show(new WindowInteropHelper(this).Handle);
-        }
-
-
-        private void OnCloseButtonClick(object sender, System.Windows.RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void OnRequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
-        {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
-            e.Handled = true;
-        }
-
-        private void OnClearLogClick(object sender, RoutedEventArgs e)
-        {
-            var config = LogManager.Configuration;
-            var target = config.AllTargets.FirstOrDefault(x => x is ListViewTarget) as ListViewTarget;
-
-            if (target != null)
-            {
-                target.Events.Clear();
+                frame.Navigate(targetPage);
             }
         }
     }

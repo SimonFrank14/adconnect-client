@@ -1,14 +1,12 @@
-﻿using GalaSoft.MvvmLight;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace ConnectClient.Gui.ViewModel
 {
-    public class AboutViewModel : ViewModelBase
+    public class AboutViewModel : ObservableRecipient
     {
 
         public string ApplicationName { get; private set; }

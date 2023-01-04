@@ -1,10 +1,10 @@
 ﻿using ConnectClient.ActiveDirectory;
 using ConnectClient.Models.Request;
 using ConnectClient.Models.Response;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -17,60 +17,46 @@ namespace ConnectClient.Rest
 
         private const string Endpoint = "/api/ad_connect";
 
-        private readonly ILogger<Client> logger;
-
-        public Client(ILogger<Client> logger)
-        {
-            this.logger = logger;
-        }
-
         private async Task<IResponse> SendAsync<T>(IRequest request, Func<HttpClient, StringContent, Task<HttpResponseMessage>> action, EndpointSettings settings)
             where T : IResponse
         {
             using (var client = new HttpClient())
             {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
                 client.BaseAddress = new Uri(settings.Url);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 client.DefaultRequestHeaders.Add("X-Token", settings.Token);
-
-                logger.LogDebug($"Endpoint Base-URL is: {client.BaseAddress.ToString()}");
 
                 var json = JsonConvert.SerializeObject(request, new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeNonAscii });
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await action(client, content);
 
-                logger.LogDebug($"Got HTTP status code {response.StatusCode}.");
-
-                try
+                if (response.IsSuccessStatusCode)
                 {
-                    if (response.IsSuccessStatusCode)
+                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
                     {
-                        if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                        {
-                            return new EmptyResponse();
-                        }
-
-                        return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+                        return new EmptyResponse();
                     }
 
-                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var responseJson = await response.Content.ReadAsStringAsync();
 
-                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                    {
-                        return JsonConvert.DeserializeObject<ViolationListResponse>(responseContent);
-                    }
+                    var returnValue = JsonConvert.DeserializeObject<T>(responseJson);
 
-                    return JsonConvert.DeserializeObject<ErrorResponse>(responseContent);
+                    return returnValue;
                 }
-                catch (Exception e)
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                 {
-                    logger.LogError(e, "Failed to send request.");
+                    return JsonConvert.DeserializeObject<ViolationListResponse>(responseContent);
                 }
+
+                return JsonConvert.DeserializeObject<ErrorResponse>(responseContent);
             }
-
-            return null;
         }
 
         public Task<IResponse> AddUserAsync(User user, EndpointSettings settings)
@@ -125,7 +111,6 @@ namespace ConnectClient.Rest
                 Lastname = user.Lastname,
                 Email = user.Email,
                 Ou = user.OU,
-                UniqueId = user.UniqueId,
                 Groups = user.Groups.ToArray()
             };
         }

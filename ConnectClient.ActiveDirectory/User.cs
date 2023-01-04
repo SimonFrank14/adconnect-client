@@ -19,8 +19,6 @@ namespace ConnectClient.ActiveDirectory
 
         public string Guid { get; set; }
 
-        public string UniqueId { get; set; }
-
         public string OU { get; set; }
 
         public string Email { get; set; }

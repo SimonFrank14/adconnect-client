@@ -1,0 +1,94 @@
+﻿<Page x:Class="ConnectClient.Gui.View.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:ui="http://schemas.modernwpf.com/2019"
+      xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:behavior="clr-namespace:ConnectClient.Gui.Behavior"
+      mc:Ignorable="d" 
+      DataContext="{Binding Source={StaticResource ViewModelLocator}, Path=Settings}"
+      Title="SettingsPage">
+
+    <DockPanel>
+        <ui:CommandBar DockPanel.Dock="Bottom">
+            <ui:AppBarButton Command="{Binding SaveCommand}" Label="Speichern" Icon="Save" />
+            <ui:AppBarButton Command="{Binding LoadOrganizationalUnitsCommand}" Label="Organisationseinheiten laden" Icon="Sync" />
+        </ui:CommandBar>
+
+        <ScrollViewer VerticalAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="Allgemeine Einstellungen">
+                    <ComboBox ui:ControlHelper.Header="Art des Benutzernamens"
+                                  ItemsSource="{Binding LdapUsernameProperties}"
+                                  SelectedItem="{Binding LdapUsernameProperty, Mode=TwoWay}" />
+                </GroupBox>
+
+                <GroupBox Header="IDP Einstellungen" Grid.Row="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBox ui:ControlHelper.Header="URL des Identity Providers"
+                                 ui:ControlHelper.PlaceholderText="https://sso.example.de/"
+                                 Text="{Binding EndpointUrl, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <TextBox ui:ControlHelper.Header="API-Token"
+                                 Text="{Binding EndpointToken, UpdateSourceTrigger=PropertyChanged}"
+                                 Grid.Row="1"/>
+                    </Grid>
+                </GroupBox>
+                
+                <GroupBox Header="Active Directory Einstellungen" Grid.Row="2">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBox Text="{Binding LdapServer, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="Domain Controller" />
+                        <ui:NumberBox SpinButtonPlacementMode="Inline" Grid.Row="1" Value="{Binding LdapPort}" Grid.Column="1" ui:ControlHelper.Header="LDAP-Port" />
+                        <CheckBox Grid.Row="2" IsChecked="{Binding LdapUseSsl}" Content="LDAPS verwenden" />
+                        <CheckBox Grid.Row="3" IsChecked="{Binding LdapUseTls}" Content="TLS verwenden (STARTTLS)" />
+                        <TextBox Grid.Row="4" Text="{Binding LdapCertificateThumbprint, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="Fingerabdruck des Zertifikats (LDAPS)"></TextBox>
+
+                        <TextBlock Grid.Row="5" TextWrapping="Wrap">
+                            Fingerabdruck eines der Zertifikate in der Zertifikatskette, die bei der Kommunikation mit dem LDAP Server verwendet wird.
+                        </TextBlock>
+
+                        <TextBox Grid.Row="6" Text="{Binding LdapFqdn, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="Fully-Qualified Domain Name" />
+                        <TextBox Grid.Row="7" Text="{Binding LdapNetBIOS,UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="NetBIOS Name der Domain" />
+
+                        <TextBox Grid.Row="8" Text="{Binding LdapUsername, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="Benutzername (lesender Active Directory-Benutzer)" />
+                        <TextBox Grid.Row="9" Text="{Binding LdapPassword, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="Passwort (lesender Active Directory-Benutzer" />
+
+                        <ui:ListView Grid.Row="10"
+                                    ItemsSource="{Binding OrganizatioalUnits}"
+                                    SelectionMode="Multiple">
+                            <b:Interaction.Behaviors>
+                                <behavior:SelectedItemsBehavior SelectedItems="{Binding SelectedOrganizationalUnits}" />
+                            </b:Interaction.Behaviors>
+                        </ui:ListView>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</Page>

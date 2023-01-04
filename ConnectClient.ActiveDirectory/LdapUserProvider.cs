@@ -25,92 +25,57 @@ namespace ConnectClient.ActiveDirectory
 
         private const string SearchFilter = "(objectclass=user)";
 
-        private readonly ILogger<LdapUserProvider> logger;
-
-        public LdapUserProvider(ILogger<LdapUserProvider> logger)
-        {
-            this.logger = logger;
-        }
-
-        public List<User> GetUsers(IEnumerable<string> organizationalUnits, string uniqueIdAttributeName, LdapSettings settings)
+        public List<User> GetUsers(IEnumerable<string> organizationalUnits, LdapSettings settings)
         {
             var list = new List<User>();
 
             using (var ldapConnection = new LdapConnection())
             {
-                try
+                ConnectLdapConnection(ldapConnection, settings);
+                ldapConnection.Bind(settings.Username, settings.Password);
+
+                var attributes = new List<string>() { LastModifiedAttribute, UserPrincipalNameAttribute, MemberOfAttribute, EmailAttribute, DisplayNameAttribute, FirstnameAttribute, LastnameAttribute, UsernameAttribute, AccountControlAttribute, GuidAttribute };
+
+                foreach (var ou in organizationalUnits)
                 {
-                    ConnectLdapConnection(ldapConnection, settings);
-                    ldapConnection.Bind(settings.Username, settings.Password);
+                    var results = ldapConnection.Search(ou, LdapConnection.SCOPE_SUB, SearchFilter, attributes.ToArray(), false);
 
-                    var attributes = new List<string>() { LastModifiedAttribute, UserPrincipalNameAttribute, MemberOfAttribute, EmailAttribute, DisplayNameAttribute, FirstnameAttribute, LastnameAttribute, UsernameAttribute, AccountControlAttribute, GuidAttribute };
-
-                    if (!string.IsNullOrEmpty(uniqueIdAttributeName))
+                    while (results.HasMore())
                     {
-                        attributes.Add(uniqueIdAttributeName);
-                    }
+                        var entry = results.Next();
 
-                    foreach (var ou in organizationalUnits)
-                    {
-                        logger.LogDebug($"Search OU {ou}...");
-                        var results = ldapConnection.Search(ou, LdapConnection.SCOPE_SUB, SearchFilter, attributes.ToArray(), false);
+                        var isActive = false;
+                        var accountControlValue = entry.getAttribute(AccountControlAttribute)?.StringValue;
 
-                        while (results.HasMore())
+                        if (accountControlValue != null)
                         {
-                            var entry = results.Next();
-
-                            logger.LogDebug($"Found user {entry.DN}");
-
-                            string uniqueId = null;
-
-                            if (!string.IsNullOrEmpty(uniqueIdAttributeName))
-                            {
-                                uniqueId = entry.getAttribute(uniqueIdAttributeName).StringValue;
-                            }
-
-                            var isActive = false;
-                            var accountControlValue = entry.getAttribute(AccountControlAttribute)?.StringValue;
-
-                            if (accountControlValue != null)
-                            {
-                                var accountControlIntValue = int.Parse(accountControlValue);
-                                isActive = !((accountControlIntValue & IsActiveAttributeValue) == IsActiveAttributeValue);
-                            }
-
-                            var lastModified = DateTime.ParseExact(
-                                entry.getAttribute(LastModifiedAttribute).StringValue,
-                                LastModifiedDateFormat,
-                                CultureInfo.InvariantCulture
-                            );
-
-                            list.Add(new User
-                            {
-                                IsActive = isActive,
-                                Username = entry.getAttribute(UsernameAttribute)?.StringValue,
-                                UPN = entry.getAttribute(UserPrincipalNameAttribute)?.StringValue,
-                                Firstname = entry.getAttribute(FirstnameAttribute)?.StringValue,
-                                Lastname = entry.getAttribute(LastnameAttribute)?.StringValue,
-                                DisplayName = entry.getAttribute(DisplayNameAttribute)?.StringValue,
-                                Email = entry.getAttribute(EmailAttribute)?.StringValue,
-                                Guid = GetGuidAsString(entry.getAttribute(GuidAttribute)?.ByteValueArray),
-                                UniqueId = uniqueId,
-                                Groups = entry.getAttribute(MemberOfAttribute)?.StringValueArray,
-                                OU = GetOU(entry.DN),
-                                LastModified = lastModified
-                            });
+                            var accountControlIntValue = int.Parse(accountControlValue);
+                            isActive = !((accountControlIntValue & IsActiveAttributeValue) == IsActiveAttributeValue);
                         }
+
+                        var lastModified = DateTime.ParseExact(
+                            entry.getAttribute(LastModifiedAttribute).StringValue,
+                            LastModifiedDateFormat,
+                            CultureInfo.InvariantCulture
+                        );
+
+                        list.Add(new User
+                        {
+                            IsActive = isActive,
+                            Username = entry.getAttribute(UsernameAttribute)?.StringValue,
+                            UPN = entry.getAttribute(UserPrincipalNameAttribute)?.StringValue,
+                            Firstname = entry.getAttribute(FirstnameAttribute)?.StringValue,
+                            Lastname = entry.getAttribute(LastnameAttribute)?.StringValue,
+                            DisplayName = entry.getAttribute(DisplayNameAttribute)?.StringValue,
+                            Email = entry.getAttribute(EmailAttribute)?.StringValue,
+                            Guid = GetGuidAsString(entry.getAttribute(GuidAttribute)?.ByteValueArray),
+                            Groups = entry.getAttribute(MemberOfAttribute)?.StringValueArray,
+                            OU = GetOU(entry.DN),
+                            LastModified = lastModified
+                        });
                     }
                 }
-                catch (LdapException e)
-                {
-                    logger.LogError(e, "LDAP error.");
-                    list = null;
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e, "Non-LDAP error.");
-                    list = null;
-                }
+
 
                 // Needed to prevent Dispose() from an infinite call, see https://github.com/dsbenghe/Novell.Directory.Ldap.NETStandard/issues/101
                 if (ldapConnection.TLS)
@@ -142,7 +107,6 @@ namespace ConnectClient.ActiveDirectory
              */
             if (settings.UseSSL)
             {
-                logger.LogDebug("Starting SSL session.");
                 ldapConnection.SecureSocketLayer = true;
             }
 
@@ -156,7 +120,6 @@ namespace ConnectClient.ActiveDirectory
              */
             if (settings.UseTLS)
             {
-                logger.LogDebug("Starting TLS session.");
                 ldapConnection.StartTls();
             }
         }

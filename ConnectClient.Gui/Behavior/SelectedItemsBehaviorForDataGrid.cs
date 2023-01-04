@@ -1,23 +1,21 @@
 ﻿using Microsoft.Xaml.Behaviors;
-using ModernWpf.Controls;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
-using ListView = ModernWpf.Controls.ListView;
 
 namespace ConnectClient.Gui.Behavior
 {
-    public class SelectedItemsBehavior : Behavior<ListView>
+    public class SelectedItemsBehaviorForDataGrid : Behavior<DataGrid>
     {
 
         private bool suppressBoundCollectionChangedEvent = false;
 
-        public static DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IEnumerable), typeof(SelectedItemsBehavior), new PropertyMetadata(OnSelectedItemsChanged));
+        public static DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IEnumerable), typeof(SelectedItemsBehaviorForDataGrid), new PropertyMetadata(OnSelectedItemsChanged));
 
         private static void OnSelectedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as SelectedItemsBehavior).OnSelectedItemsChanged(e.OldValue as IEnumerable, e.NewValue as IEnumerable);
+            (d as SelectedItemsBehaviorForDataGrid).OnSelectedItemsChanged(e.OldValue as IEnumerable, e.NewValue as IEnumerable);
         }
 
         private void OnSelectedItemsChanged(IEnumerable oldValue, IEnumerable newValue)
@@ -87,9 +85,14 @@ namespace ConnectClient.Gui.Behavior
 
             AssociatedObject.SelectionChanged += OnListViewSelectionChanged;
 
+            AssociatedObject.Unloaded += delegate
+            {
+                AssociatedObject.SelectionChanged -= OnListViewSelectionChanged;
+            };
+
             // Set selected items
             suppressBoundCollectionChangedEvent = true;
-            foreach(var item in SelectedItems)
+            foreach (var item in SelectedItems)
             {
                 AssociatedObject.SelectedItems.Add(item);
             }

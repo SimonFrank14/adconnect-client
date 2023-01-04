@@ -16,7 +16,6 @@
       <Directory Id="ProgramFiles64Folder">
         <Directory Id="VENDORFOLDER" Name="SchulIT">
           <Directory Id="APPLICATIONFOLDER" Name="Active Directory Connect Client">
-            <Directory Id="CONSOLE_INSTALLLOCATION" Name="Console" />
             <Directory Id="GUI_INSTALLLOCATION" Name="GUI" />
           </Directory>
         </Directory>
@@ -35,7 +34,6 @@
     </Directory>
 
     <Feature Id="MainFeature" Title="Active Directory Connect Client" Level="1">
-      <ComponentGroupRef Id="ConsoleSourceComponentGroup" />
       <ComponentGroupRef Id="GuiSourceComponentGroup" />
 
       <Feature Id="ShortcutFeature" Title="Startmenü-Verknüpfung" Level="1">

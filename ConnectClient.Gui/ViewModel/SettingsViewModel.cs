@@ -1,9 +1,8 @@
-﻿using ConnectClient.ActiveDirectory;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ConnectClient.ActiveDirectory;
 using ConnectClient.Core.Settings;
-using ConnectClient.Gui.Message;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using ConnectClient.Gui.UI;
 using Novell.Directory.Ldap;
 using System;
 using System.Collections.Generic;
@@ -13,19 +12,17 @@ using System.Linq;
 using System.Net.Security;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
-using System.Windows.Documents;
-using System.Windows.Forms;
 
 namespace ConnectClient.Gui.ViewModel
 {
-    public class SettingsViewModel : ViewModelBase
+    public class SettingsViewModel : ObservableRecipient
     {
         private string uniqueIdAttributeName;
 
         public string UniqueIdAttributeName
         {
             get { return uniqueIdAttributeName; }
-            set { Set(() => UniqueIdAttributeName, ref uniqueIdAttributeName, value); }
+            set { SetProperty(ref uniqueIdAttributeName, value); }
         }
 
         public ObservableCollection<string> SelectedOrganizationalUnits { get; } = new ObservableCollection<string>();
@@ -37,7 +34,7 @@ namespace ConnectClient.Gui.ViewModel
         public string EndpointUrl
         {
             get { return endpointUrl; }
-            set { Set(() => EndpointUrl, ref endpointUrl, value); }
+            set { SetProperty(ref endpointUrl, value); }
         }
 
         private string endpointToken;
@@ -45,7 +42,7 @@ namespace ConnectClient.Gui.ViewModel
         public string EndpointToken
         {
             get { return endpointToken; }
-            set { Set(() => EndpointToken, ref endpointToken, value); }
+            set { SetProperty(ref endpointToken, value); }
         }
 
         private string ldapServer;
@@ -55,8 +52,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapServer; }
             set
             {
-                Set(() => LdapServer, ref ldapServer, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapServer, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -67,8 +64,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapPort; }
             set
             {
-                Set(() => LdapPort, ref ldapPort, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapPort, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -79,8 +76,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapUseSsl; }
             set
             {
-                Set(() => LdapUseSsl, ref ldapUseSsl, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapUseSsl, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -91,8 +88,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapUseTls; }
             set
             {
-                Set(() => LdapUseTls, ref ldapUseTls, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapUseTls, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -103,8 +100,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapFqdn; }
             set
             {
-                Set(() => LdapFqdn, ref ldapFqdn, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapFqdn, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -115,8 +112,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapNetBios; }
             set
             {
-                Set(() => LdapNetBIOS, ref ldapNetBios, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapNetBios, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -127,8 +124,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapUsername; }
             set
             {
-                Set(() => LdapUsername, ref ldapUsername, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapUsername, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -139,8 +136,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapPassword; }
             set
             {
-                Set(() => LdapPassword, ref ldapPassword, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapPassword, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -151,8 +148,8 @@ namespace ConnectClient.Gui.ViewModel
             get { return ldapCertificateThumbprint; }
             set
             {
-                Set(() => LdapCertificateThumbprint, ref ldapCertificateThumbprint, value);
-                LoadOrganizationalUnitsCommand?.RaiseCanExecuteChanged();
+                SetProperty(ref ldapCertificateThumbprint, value);
+                LoadOrganizationalUnitsCommand?.NotifyCanExecuteChanged();
             }
         }
 
@@ -163,7 +160,7 @@ namespace ConnectClient.Gui.ViewModel
         public UsernameProperty LdapUsernameProperty
         {
             get { return ldapUsernameProperty; }
-            set { Set(() => LdapUsernameProperty, ref ldapUsernameProperty, value); }
+            set { SetProperty(ref ldapUsernameProperty, value); }
         }
 
         #region Commands
@@ -177,13 +174,11 @@ namespace ConnectClient.Gui.ViewModel
         #region Services
 
         private readonly SettingsManager settingsManager;
-
-        public IMessenger Messenger { get { return base.MessengerInstance; } }
+        private readonly IDialogHelper dialogHelper;
 
         #endregion
 
-        public SettingsViewModel(SettingsManager settingsManager, IMessenger messenger)
-            : base(messenger)
+        public SettingsViewModel(SettingsManager settingsManager, IDialogHelper dialogHelper)
         {
             this.settingsManager = settingsManager;
 
@@ -224,7 +219,7 @@ namespace ConnectClient.Gui.ViewModel
             }
             catch (LdapException e)
             {
-                Messenger.Send(new ErrorDialogMessage { Exception = e, Header = "Fehler", Title = "Fehler beim Laden der OUs", Text = "Beim Laden der Organisationseinheiten aus dem Active Directory ist ein Fehler aufgetreten." });
+                dialogHelper.ShowException(e);
             }
         }
 
