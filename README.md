@@ -2,7 +2,7 @@
 
 [![Build Status](https://dev.azure.com/schulit/Active%20Directory%20Connect%20Client/_apis/build/status/SchulIT.adconnect-client?branchName=master)](https://dev.azure.com/schulit/Active%20Directory%20Connect%20Client/_build/latest?definitionId=10&branchName=master)
 ![GitHub](https://img.shields.io/github/license/schulit/adconnect-client?style=flat-square)
-![.NET Core 3.1](https://img.shields.io/badge/.NET%20Core-3.1-brightgreen?style=flat-square)
+![.NET Core 3.1](https://img.shields.io/badge/.NET%207-brightgreen?style=flat-square)
 
 Mithilfe des Active Directory Connect Clients werden Benutzer aus dem Active Directory im Identity Provider 
 vorab provisioniert. Dies ermöglicht es, Benutzer zu bearbeiten bevor sie sich initial anmelden. 
@@ -10,10 +10,14 @@ vorab provisioniert. Dies ermöglicht es, Benutzer zu bearbeiten bevor sie sich 
 ## Installation
 
 Das aktuellste Installationspaket lässt sich [hier](https://github.com/schulit/adconnect-client//releases) herunterladen. Der Client benötigt keine
-weiteren Abhängigkeiten (.NET Core 3.1 wird mit der Software mitgeliefert). 
+weiteren Abhängigkeiten (.NET 7 wird mit der Software mitgeliefert). 
 
-Das Tool ist auf allen Windows-Betriebssystemen lauffähig, auf denen auch .NET Core 3.1 lauffähig ist. 
+Das Tool ist auf allen Windows-Betriebssystemen lauffähig, auf denen auch .NET 7 lauffähig ist. 
 Die Installation auf einem Domaincontroller wird grundsätzlich unterstützt, jedoch nicht empfohlen. 
+
+## Kompatibilität
+
+Version 2 benötigt mindestens Version 1.4.0 des Single-Sign-Ons.
 
 ## Einrichtung
 
