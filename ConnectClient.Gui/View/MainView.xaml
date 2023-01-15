@@ -9,7 +9,8 @@
         ui:TitleBar.IsBackButtonVisible="False"
         ui:TitleBar.IsIconVisible="True"
         ui:TitleBar.Background="{DynamicResource SystemControlBackgroundAccentBrush}"
-        Title="{Binding About.ApplicationName, Source={StaticResource ViewModelLocator}}" Height="450" Width="800">
+        Title="{Binding About.ApplicationName, Source={StaticResource ViewModelLocator}}" 
+        Height="800" Width="1000">
     <ui:NavigationView PaneDisplayMode="Top"
                        IsSettingsVisible="False"
                        SelectionChanged="OnSelectionChanged"
