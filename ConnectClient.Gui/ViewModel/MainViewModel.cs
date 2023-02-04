@@ -41,6 +41,19 @@ namespace ConnectClient.Gui.ViewModel
             set { SetProperty(ref progressText, value); }
         }
 
+        private string filter;
+
+        public string Filter
+        {
+            get { return filter; }
+            set
+            {
+                SetProperty(ref filter, value);
+                UsersView.Refresh();
+            }
+        }
+
+
         /// <summary>
         /// Users read from Active Directory
         /// </summary>
@@ -99,6 +112,7 @@ namespace ConnectClient.Gui.ViewModel
             UsersView = CollectionViewSource.GetDefaultView(Users);
             UsersView.GroupDescriptions.Add(new PropertyGroupDescription("OU"));
             UsersView.SortDescriptions.Add(new SortDescription("OU", ListSortDirection.Ascending));
+            UsersView.Filter += OnApplyFilter;
 
             MissingUsersView = CollectionViewSource.GetDefaultView(MissingUsers);
             MissingUsersView.GroupDescriptions.Add(new PropertyGroupDescription("Grade"));
@@ -119,6 +133,23 @@ namespace ConnectClient.Gui.ViewModel
             {
                 RemoveCommand?.NotifyCanExecuteChanged();
             };
+
+
+        }
+
+        private bool OnApplyFilter(object obj)
+        {
+            if(string.IsNullOrEmpty(Filter))
+            {
+                return true;
+            }
+
+            var user = obj as User;
+
+            return (user.Username != null && user.Username.Contains(Filter, StringComparison.InvariantCultureIgnoreCase))
+                || (user.Firstname != null && user.Firstname.Contains(Filter, StringComparison.InvariantCultureIgnoreCase))
+                || (user.Lastname != null && user.Lastname.Contains(Filter, StringComparison.InvariantCultureIgnoreCase))
+                || (user.Email != null && user.Email.Contains(Filter, StringComparison.InvariantCultureIgnoreCase));
         }
 
         private void SelectAll()

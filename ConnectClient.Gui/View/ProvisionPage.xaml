@@ -31,6 +31,12 @@
                 <TextBlock VerticalAlignment="Center" Text="{Binding ProgressText}" />
             </ui:AppBarElementContainer>
 
+            <ui:AppBarElementContainer VerticalAlignment="Center">
+                <TextBox ui:ControlHelper.PlaceholderText="Benutzer suchen" Width="200" Text="{Binding Filter, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+            </ui:AppBarElementContainer>
+
+            <ui:AppBarSeparator />
+
             <ui:AppBarButton Icon="Accept" Label="Alle auswählen"
                              Command="{Binding SelectAllCommand}" />
 
