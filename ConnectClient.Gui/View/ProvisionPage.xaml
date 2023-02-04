@@ -31,6 +31,12 @@
                 <TextBlock VerticalAlignment="Center" Text="{Binding ProgressText}" />
             </ui:AppBarElementContainer>
 
+            <ui:AppBarButton Icon="Accept" Label="Alle auswählen"
+                             Command="{Binding SelectAllCommand}" />
+
+            <ui:AppBarButton Icon="Cancel" Label="Alle abwählen"
+                             Command="{Binding UnselectAllCommand}" />
+
             <ui:AppBarButton Icon="Upload" Label="ausgewählte Benutzer provisionieren"
                              Command="{Binding ProvisionCommand}" />
 
@@ -73,7 +79,32 @@
 
                                             <Border Background="{StaticResource SystemControlBackgroundBaseLowBrush}"
                                                     Padding="10">
-                                                <TextBlock FontWeight="Bold" Text="{Binding Path=Name}"/>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <TextBlock FontWeight="Bold" 
+                                                               Text="{Binding Path=Name}"
+                                                               VerticalAlignment="Center"/>
+
+                                                    <Button Grid.Column="1" Margin="5,0" Content="alle abwählen">
+                                                        <b:Interaction.Behaviors>
+                                                            <behavior:SelectAllBehavior SelectionBehavior="Unselect"
+                                                                                        Items="{Binding Items}"
+                                                                                        SelectedItems="{Binding Source={StaticResource ViewModelLocator}, Path=Main.UsersToProvision}" />
+                                                        </b:Interaction.Behaviors>
+                                                    </Button>
+                                                    <Button Grid.Column="2" Content="alle auswählen">
+                                                        <b:Interaction.Behaviors>
+                                                            <behavior:SelectAllBehavior SelectionBehavior="Select"
+                                                                                        Items="{Binding Items}"
+                                                                                        SelectedItems="{Binding Source={StaticResource ViewModelLocator}, Path=Main.UsersToProvision}" />
+                                                        </b:Interaction.Behaviors>
+                                                    </Button>
+                                                </Grid>
                                             </Border>
 
                                             <ItemsPresenter Grid.Row="1"/>

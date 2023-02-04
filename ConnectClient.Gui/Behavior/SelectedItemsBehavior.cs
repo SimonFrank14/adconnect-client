@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xaml.Behaviors;
-using ModernWpf.Controls;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Windows;
@@ -46,18 +45,22 @@ namespace ConnectClient.Gui.Behavior
 
             if (e.NewItems != null)
             {
+                suppressBoundCollectionChangedEvent = true;
                 foreach (var addedItem in e.NewItems)
                 {
                     AssociatedObject.SelectedItems.Add(addedItem);
                 }
+                suppressBoundCollectionChangedEvent = false;
             }
 
             if (e.OldItems != null)
             {
+                suppressBoundCollectionChangedEvent = true;
                 foreach (var removedItem in e.OldItems)
                 {
                     AssociatedObject.SelectedItems.Remove(removedItem);
                 }
+                suppressBoundCollectionChangedEvent = false;
             }
 
             var collection = sender as ICollection;
@@ -89,7 +92,7 @@ namespace ConnectClient.Gui.Behavior
 
             // Set selected items
             suppressBoundCollectionChangedEvent = true;
-            foreach(var item in SelectedItems)
+            foreach (var item in SelectedItems)
             {
                 AssociatedObject.SelectedItems.Add(item);
             }

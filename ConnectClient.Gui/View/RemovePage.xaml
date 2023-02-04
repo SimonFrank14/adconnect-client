@@ -62,7 +62,32 @@
 
                                             <Border Background="{StaticResource SystemControlBackgroundBaseLowBrush}"
                                                     Padding="10">
-                                                <TextBlock FontWeight="Bold" Text="{Binding Path=Name}"/>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock FontWeight="Bold" Text="{Binding Path=Name}"
+                                                               VerticalAlignment="Center"/>
+
+                                                    <Button Grid.Column="1" Margin="5,0" Content="alle abwählen">
+                                                        <b:Interaction.Behaviors>
+                                                            <behavior:SelectAllBehavior SelectionBehavior="Unselect"
+                                                                                        Items="{Binding Items}"
+                                                                                        SelectedItems="{Binding Source={StaticResource ViewModelLocator}, Path=Main.UsersToRemove}" />
+                                                        </b:Interaction.Behaviors>
+                                                    </Button>
+                                                    <Button Grid.Column="2" Content="alle auswählen">
+                                                        <b:Interaction.Behaviors>
+                                                            <behavior:SelectAllBehavior SelectionBehavior="Select"
+                                                                                        Items="{Binding Items}"
+                                                                                        SelectedItems="{Binding Source={StaticResource ViewModelLocator}, Path=Main.UsersToRemove}" />
+                                                        </b:Interaction.Behaviors>
+                                                    </Button>
+                                                </Grid>
+                                                
                                             </Border>
 
                                             <ItemsPresenter Grid.Row="1"/>

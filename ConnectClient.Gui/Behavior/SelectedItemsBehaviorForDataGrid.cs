@@ -44,18 +44,22 @@ namespace ConnectClient.Gui.Behavior
 
             if (e.NewItems != null)
             {
+                suppressBoundCollectionChangedEvent = true;
                 foreach (var addedItem in e.NewItems)
                 {
                     AssociatedObject.SelectedItems.Add(addedItem);
                 }
+                suppressBoundCollectionChangedEvent = false;
             }
 
             if (e.OldItems != null)
             {
+                suppressBoundCollectionChangedEvent = true;
                 foreach (var removedItem in e.OldItems)
                 {
                     AssociatedObject.SelectedItems.Remove(removedItem);
                 }
+                suppressBoundCollectionChangedEvent = false;
             }
 
             var collection = sender as ICollection;

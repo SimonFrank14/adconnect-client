@@ -73,6 +73,10 @@ namespace ConnectClient.Gui.ViewModel
 
         public AsyncRelayCommand<bool> LoadActiveDirectoryUsers { get; private set; }
 
+        public RelayCommand SelectAllCommand { get; private set; }
+
+        public RelayCommand UnselectAllCommand { get; private set; }
+
         #endregion
 
         #region Services
@@ -103,6 +107,8 @@ namespace ConnectClient.Gui.ViewModel
             ProvisionCommand = new AsyncRelayCommand(ProvisionAsync, CanProvision);
             RemoveCommand = new AsyncRelayCommand(RemoveUsersAsync, CanRemoveUsers);
             LoadActiveDirectoryUsers = new AsyncRelayCommand<bool>(LoadActiveDirectoryUsersAsync);
+            SelectAllCommand = new RelayCommand(SelectAll);
+            UnselectAllCommand = new RelayCommand(UnselectAll);
 
             UsersToProvision.CollectionChanged += delegate
             {
@@ -113,6 +119,25 @@ namespace ConnectClient.Gui.ViewModel
             {
                 RemoveCommand?.NotifyCanExecuteChanged();
             };
+        }
+
+        private void SelectAll()
+        {
+            foreach (var user in Users)
+            {
+                if (!UsersToProvision.Contains(user))
+                {
+                    UsersToProvision.Add(user);
+                }
+            }
+        }
+
+        private void UnselectAll()
+        {
+            foreach(var user in Users)
+            {
+                UsersToProvision.Remove(user);
+            }
         }
 
         public async Task ProvisionAsync()
