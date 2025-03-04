@@ -153,16 +153,6 @@ namespace ConnectClient.Gui.ViewModel
             }
         }
 
-        public List<UsernameProperty> LdapUsernameProperties { get; } = new List<UsernameProperty> { UsernameProperty.sAMAccountName, UsernameProperty.UserPrincipalName };
-
-        private UsernameProperty ldapUsernameProperty;
-
-        public UsernameProperty LdapUsernameProperty
-        {
-            get { return ldapUsernameProperty; }
-            set { SetProperty(ref ldapUsernameProperty, value); }
-        }
-
         #region Commands
 
         public RelayCommand SaveCommand { get; private set; }
@@ -236,8 +226,6 @@ namespace ConnectClient.Gui.ViewModel
         {
             var settings = settingsManager.GetSettings();
 
-            UniqueIdAttributeName = settings.UniqueIdAttributeName;
-
             EndpointUrl = settings.Endpoint.Url;
             EndpointToken = settings.Endpoint.Token;
             LdapServer = settings.Ldap.Server;
@@ -249,7 +237,6 @@ namespace ConnectClient.Gui.ViewModel
             LdapUsername = settings.Ldap.Username;
             LdapPassword = settings.Ldap.Password;
             LdapCertificateThumbprint = settings.Ldap.CertificateThumbprint;
-            LdapUsernameProperty = settings.Ldap.UsernameProperty;
 
             if(CanLoadOrganizationalUnits())
             {
@@ -265,7 +252,6 @@ namespace ConnectClient.Gui.ViewModel
         private void Save()
         {
             var settings = settingsManager.GetSettings();
-            settings.UniqueIdAttributeName = UniqueIdAttributeName;
             settings.OrganizationalUnits = SelectedOrganizationalUnits.Distinct().ToArray();
             settings.Endpoint.Url = EndpointUrl;
             settings.Endpoint.Token = EndpointToken;
@@ -278,7 +264,6 @@ namespace ConnectClient.Gui.ViewModel
             settings.Ldap.Username = LdapUsername;
             settings.Ldap.Password = LdapPassword;
             settings.Ldap.CertificateThumbprint = LdapCertificateThumbprint;
-            settings.Ldap.UsernameProperty = LdapUsernameProperty;
 
             settingsManager.SaveSettings();
         }

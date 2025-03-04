@@ -58,10 +58,5 @@ namespace ConnectClient.ActiveDirectory
         /// </summary>
         [JsonProperty("certificate_thumbprint")]
         public string CertificateThumbprint { get; set; }
-
-        /// <summary>
-        /// Specifies which attribute is used for usernames.
-        /// </summary>
-        public UsernameProperty UsernameProperty { get; set; } = UsernameProperty.UserPrincipalName;
     }
 }
