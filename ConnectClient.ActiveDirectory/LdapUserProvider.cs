@@ -93,18 +93,21 @@ namespace ConnectClient.ActiveDirectory
 
         private void ConnectLdapConnection(LdapConnection ldapConnection, LdapSettings settings)
         {
-            ldapConnection.UserDefinedServerCertValidationDelegate += (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
+            if (!string.IsNullOrEmpty(settings.CertificateThumbprint))
             {
-                foreach (var cert in chain.ChainElements)
+                ldapConnection.UserDefinedServerCertValidationDelegate += (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) =>
                 {
-                    if (cert.Certificate.Thumbprint.Equals(settings.CertificateThumbprint, StringComparison.CurrentCultureIgnoreCase))
+                    foreach (var cert in chain.ChainElements)
                     {
-                        return true;
+                        if (cert.Certificate.Thumbprint.Equals(settings.CertificateThumbprint, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            return true;
+                        }
                     }
-                }
 
-                return false;
-            };
+                    return false;
+                };
+            }
 
             /**
              * CONFIGURE SSL
