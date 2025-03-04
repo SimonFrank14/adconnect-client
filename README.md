@@ -9,10 +9,10 @@ vorab provisioniert. Dies ermöglicht es, Benutzer zu bearbeiten bevor sie sich 
 
 ## Installation
 
-Das aktuellste Installationspaket lässt sich [hier](https://github.com/schulit/adconnect-client//releases) herunterladen. Der Client benötigt keine
-weiteren Abhängigkeiten (.NET 7 wird mit der Software mitgeliefert). 
+Das aktuellste Installationspaket lässt sich [hier](https://github.com/schulit/adconnect-client/releases) herunterladen. Der Client benötigt keine
+weiteren Abhängigkeiten (.NET 8 wird mit der Software mitgeliefert). 
 
-Das Tool ist auf allen Windows-Betriebssystemen lauffähig, auf denen auch .NET 7 lauffähig ist. 
+Das Tool ist auf allen Windows-Betriebssystemen lauffähig, auf denen auch .NET 8 lauffähig ist. 
 Die Installation auf einem Domaincontroller wird grundsätzlich unterstützt, jedoch nicht empfohlen. 
 
 ## Kompatibilität
