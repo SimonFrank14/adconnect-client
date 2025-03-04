@@ -11,7 +11,7 @@
     <xsl:attribute name='{name()}'>
       <xsl:variable name='sourceDirStart' select='substring-before(., "\")' />
       <xsl:variable name='sourceDirEnd' select='substring-after(., "\")' />
-      <xsl:value-of select='concat($sourceDirStart, "..\..\..\Release\net7.0-windows\win-x64\publish\" , $sourceDirEnd)'/>
+      <xsl:value-of select='concat($sourceDirStart, "..\..\..\Release\net8.0-windows7.0\win-x64\publish\" , $sourceDirEnd)'/>
     </xsl:attribute>
   </xsl:template>
 
