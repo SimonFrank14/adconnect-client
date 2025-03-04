@@ -55,7 +55,7 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>GUI_INSTALLLOCATION</RefTargetDir>
       <SourceComponentGroup>GuiSourceComponentGroup</SourceComponentGroup>
-      <TargetFrameworkIdentifier>net7.0-windows</TargetFrameworkIdentifier>
+      <TargetFrameworkIdentifier>net8.0-windows7.0</TargetFrameworkIdentifier>
       <Runtime>win-$(Platform)</Runtime>
       <IsDotnetSDKProject>True</IsDotnetSDKProject>
       <SourceDir>GuiSourceDir</SourceDir>
