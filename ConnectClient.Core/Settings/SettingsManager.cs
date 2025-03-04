@@ -32,6 +32,11 @@ namespace ConnectClient.Core.Settings
 
             if (!File.Exists(file))
             {
+                if (!Directory.Exists(Path.GetDirectoryName(file)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                }
+
                 using var stream = new StreamWriter(file);
                 stream.Write(JsonConvert.SerializeObject(new JsonSettings(), Formatting.Indented));
             }
