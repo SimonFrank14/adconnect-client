@@ -14,5 +14,8 @@ namespace ConnectClient.Core.Settings
 
         [JsonProperty("organizational_units")]
         public string[] OrganizationalUnits { get; set; } = [];
+
+        [JsonProperty("ignored_users")]
+        public string[] IgnoredUsers { get; set; } = [];
     }
 }

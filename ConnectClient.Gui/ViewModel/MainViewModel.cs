@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Markup;
 
 namespace ConnectClient.Gui.ViewModel
 {
@@ -53,32 +54,33 @@ namespace ConnectClient.Gui.ViewModel
             }
         }
 
-
         /// <summary>
         /// Users read from Active Directory
         /// </summary>
-        public ObservableCollection<User> Users { get; } = new ObservableCollection<User>();
+        public ObservableCollection<User> Users { get; } = [];
 
         public ICollectionView UsersView { get; }
 
         /// <summary>
         /// Selected Active Directory users to be provisioned (either create or update)
         /// </summary>
-        public ObservableCollection<User> UsersToProvision { get; } = new ObservableCollection<User>();
+        public ObservableCollection<User> UsersToProvision { get; } = [];
 
         /// <summary>
         /// Users read from online IDP with no corresponding Active Directory user
         /// </summary>
-        public ObservableCollection<OnlineUser> MissingUsers { get; } = new ObservableCollection<OnlineUser>();
+        public ObservableCollection<OnlineUser> MissingUsers { get; } = [];
 
         public ICollectionView MissingUsersView { get; }
 
         /// <summary>
         /// Selected Active Directory users to be removed from online IDP
         /// </summary>
-        public ObservableCollection<OnlineUser> UsersToRemove { get; } = new ObservableCollection<OnlineUser> { };
+        public ObservableCollection<OnlineUser> UsersToRemove { get; } = [];
 
         #region Command
+
+        public AsyncRelayCommand<User> IgnoreUserCommand { get; set; }
 
         public AsyncRelayCommand ProvisionCommand { get; private set; }
 
@@ -123,6 +125,7 @@ namespace ConnectClient.Gui.ViewModel
             LoadActiveDirectoryUsers = new AsyncRelayCommand<bool>(LoadActiveDirectoryUsersAsync);
             SelectAllCommand = new RelayCommand(SelectAll);
             UnselectAllCommand = new RelayCommand(UnselectAll);
+            IgnoreUserCommand = new AsyncRelayCommand<User>(IgnoreUser, CanIgnoreUser);
 
             UsersToProvision.CollectionChanged += delegate
             {
@@ -133,9 +136,31 @@ namespace ConnectClient.Gui.ViewModel
             {
                 RemoveCommand?.NotifyCanExecuteChanged();
             };
-
-
         }
+
+        private async Task IgnoreUser(User user)
+        {
+            var settings = settingsManager.GetSettings();
+
+            if (settings.IgnoredUsers.Contains(user.Guid))
+            {
+                return;
+            }
+
+            if (!dialogHelper.Confirm("Soll der Benutzer " + user.UPN + " wirklich ignoriert werden?", "Diese Aktion kann aktuell nur durch Ändern der settings.json rückgängig gemacht werden."))
+            {
+                return; 
+            }
+
+
+            settings.IgnoredUsers = [.. settings.IgnoredUsers, user.Guid];
+            settingsManager.SaveSettings();
+
+            Users.Remove(user);
+            UsersToProvision.Remove(user);
+        }
+
+        private bool CanIgnoreUser(User user) => user != null && !settingsManager.GetSettings().IgnoredUsers.Contains(user.Guid);
 
         private bool OnApplyFilter(object obj)
         {
@@ -242,6 +267,7 @@ namespace ConnectClient.Gui.ViewModel
             try
             {
                 IsBusy = true;
+
                 ProgressText = "Lade Benutzer aus Active Directory";
 
                 var settings = settingsManager.GetSettings();
@@ -255,7 +281,10 @@ namespace ConnectClient.Gui.ViewModel
 
                 foreach (var user in users.OrderBy(x => x.Username))
                 {
-                    Users.Add(user);
+                    if(!settings.IgnoredUsers.Contains(user.Guid))
+                    {
+                        Users.Add(user);
+                    }
                 }
 
                 ProgressText = "Lade Online-Benutzer";

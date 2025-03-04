@@ -41,17 +41,36 @@ namespace ConnectClient.Gui.UI
             ShowDialogPage(page);
         }
 
-        private void ShowDialogPage(TaskDialogPage page)
+        public bool Confirm(string header, string message)
+        {
+            var confirmButton = new TaskDialogButton("Bestätigen");
+            var cancelButton = new TaskDialogButton("Abbrechen");
+
+            var page = new TaskDialogPage
+            {
+                Caption = "Bestätigung",
+                Heading = header,
+                Text = message,
+                Icon = TaskDialogIcon.Warning,
+                Buttons = [ confirmButton, cancelButton ]
+            };
+
+            var result = ShowDialogPage(page);
+
+            return result == confirmButton;
+        }
+
+        private TaskDialogButton ShowDialogPage(TaskDialogPage page)
         {
             var activeWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
 
             if (activeWindow != null)
             {
-                TaskDialog.ShowDialog(new WindowInteropHelper(activeWindow).Handle, page);
+                return TaskDialog.ShowDialog(new WindowInteropHelper(activeWindow).Handle, page);
             }
             else
             {
-                TaskDialog.ShowDialog(page);
+                return TaskDialog.ShowDialog(page);
             }
         }
     }

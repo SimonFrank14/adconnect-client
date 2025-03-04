@@ -129,6 +129,13 @@
                 <DataGridTextColumn Header="Benutzername" Binding="{Binding Username}" />
                 <DataGridTextColumn Header="UserPrincipalName" Binding="{Binding UPN}" />
                 <DataGridTextColumn Header="E-Mail" Binding="{Binding Email}" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding Source={StaticResource ViewModelLocator}, Path=Main.IgnoreUserCommand}" CommandParameter="{Binding}">ignorieren</Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

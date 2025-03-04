@@ -64,7 +64,7 @@
                         <TextBox Grid.Row="4" Text="{Binding LdapCertificateThumbprint, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="Fingerabdruck des Zertifikats (LDAPS)"></TextBox>
 
                         <TextBlock Grid.Row="5" TextWrapping="Wrap">
-                            Fingerabdruck eines der Zertifikate in der Zertifikatskette, die bei der Kommunikation mit dem LDAP Server verwendet wird.
+                            Fingerabdruck eines der Zertifikate in der Zertifikatskette, die bei der Kommunikation mit dem LDAP Server verwendet wird. Leer lassen, um die Prüfung zu überspringen (unsicher, nicht empfohlen).
                         </TextBlock>
 
                         <TextBox Grid.Row="6" Text="{Binding LdapFqdn, UpdateSourceTrigger=PropertyChanged}" ui:ControlHelper.Header="Fully-Qualified Domain Name" />

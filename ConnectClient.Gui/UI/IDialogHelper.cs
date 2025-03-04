@@ -7,5 +7,7 @@ namespace ConnectClient.Gui.UI
         void ShowSuccess(int adds, int updates, int removals);
 
         void ShowException(Exception e);
+
+        bool Confirm(string header, string message);
     }
 }
