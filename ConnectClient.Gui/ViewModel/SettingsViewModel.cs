@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ConnectClient.ActiveDirectory;
 using ConnectClient.Core.Settings;
 using ConnectClient.Gui.UI;
 using Novell.Directory.Ldap;
