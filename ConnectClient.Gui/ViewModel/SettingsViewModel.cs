@@ -15,7 +15,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace ConnectClient.Gui.ViewModel
 {
-    public class SettingsViewModel : ObservableRecipient
+    public partial class SettingsViewModel : ObservableRecipient
     {
         private string uniqueIdAttributeName;
 
@@ -25,9 +25,9 @@ namespace ConnectClient.Gui.ViewModel
             set { SetProperty(ref uniqueIdAttributeName, value); }
         }
 
-        public ObservableCollection<string> SelectedOrganizationalUnits { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> SelectedOrganizationalUnits { get; } = [];
 
-        public ObservableCollection<string> OrganizatioalUnits { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> OrganizatioalUnits { get; } = [];
 
         private string endpointUrl;
 
@@ -171,6 +171,7 @@ namespace ConnectClient.Gui.ViewModel
         public SettingsViewModel(SettingsManager settingsManager, IDialogHelper dialogHelper)
         {
             this.settingsManager = settingsManager;
+            this.dialogHelper = dialogHelper;
 
             SaveCommand = new RelayCommand(Save);
             LoadOrganizationalUnitsCommand = new RelayCommand(LoadOrganizationalUnits, CanLoadOrganizationalUnits);
@@ -188,7 +189,7 @@ namespace ConnectClient.Gui.ViewModel
 
                 var searchBase = string.Join(',', LdapFqdn.Split('.').Select(x => $"DC={x}"));
 
-                var results = ldapConnection.Search(searchBase, LdapConnection.SCOPE_SUB, "(objectCategory=organizationalUnit)", Array.Empty<string>(), false);
+                var results = ldapConnection.Search(searchBase, LdapConnection.SCOPE_SUB, "(objectCategory=organizationalUnit)", [], false);
                 var ous = new List<string>();
 
                 while (results.HasMore())
@@ -199,7 +200,7 @@ namespace ConnectClient.Gui.ViewModel
 
                         ous.Add(entry.DN);
                     }
-                    catch (LdapReferralException e) { }
+                    catch (LdapReferralException) { }
                 }
 
                 foreach (var ou in ous.OrderBy(x => x, new OuDnComparer()))
@@ -298,7 +299,7 @@ namespace ConnectClient.Gui.ViewModel
         {
             foreach (var cert in chain.ChainElements)
             {
-                if (cert.Certificate.Thumbprint.ToLower() == LdapCertificateThumbprint.ToLower())
+                if (cert.Certificate.Thumbprint.Equals(LdapCertificateThumbprint, StringComparison.CurrentCultureIgnoreCase))
                 {
                     return true;
                 }
@@ -308,10 +309,10 @@ namespace ConnectClient.Gui.ViewModel
         }
 
 
-        private class OuDnComparer : IComparer<string>
+        private partial class OuDnComparer : IComparer<string>
         {
-            [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
-            private static extern int StrCmpLogicalW(string psz1, string psz2);
+            [LibraryImport("shlwapi.dll", EntryPoint = "StrCmpLogicalW", StringMarshalling = StringMarshalling.Utf16)]
+            private static partial int StrCmpLogicalW(string psz1, string psz2);
 
             public int Compare([AllowNull] string x, [AllowNull] string y)
             {
