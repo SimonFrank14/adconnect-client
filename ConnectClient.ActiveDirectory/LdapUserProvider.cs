@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Novell.Directory.Ldap;
+﻿using Novell.Directory.Ldap;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,6 +27,11 @@ namespace ConnectClient.ActiveDirectory
         public List<User> GetUsers(IEnumerable<string> organizationalUnits, LdapSettings settings)
         {
             var list = new List<User>();
+
+            if(string.IsNullOrEmpty(settings.Server))
+            {
+                return list;
+            }
 
             using (var ldapConnection = new LdapConnection())
             {
@@ -93,7 +97,7 @@ namespace ConnectClient.ActiveDirectory
             {
                 foreach (var cert in chain.ChainElements)
                 {
-                    if (cert.Certificate.Thumbprint.ToLower() == settings.CertificateThumbprint.ToLower())
+                    if (cert.Certificate.Thumbprint.Equals(settings.CertificateThumbprint, StringComparison.CurrentCultureIgnoreCase))
                     {
                         return true;
                     }
