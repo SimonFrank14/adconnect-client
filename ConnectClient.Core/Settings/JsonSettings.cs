@@ -13,6 +13,6 @@ namespace ConnectClient.Core.Settings
         public LdapSettings Ldap { get; set; } = new LdapSettings();
 
         [JsonProperty("organizational_units")]
-        public string[] OrganizationalUnits { get; set; }
+        public string[] OrganizationalUnits { get; set; } = [];
     }
 }
