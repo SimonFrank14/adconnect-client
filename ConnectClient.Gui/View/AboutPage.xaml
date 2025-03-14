@@ -34,7 +34,7 @@
             </ui:HyperlinkButton>
 
             <TextBlock Grid.Row="6" TextWrapping="Wrap" Margin="0,10,0,10">
-            Dieses Programm nutzt Bibliotheken von Drittanbietern. Diese sind im Folgenden aufgelistet. Besonderen Dank an die Entwickler dieser Bibliothken.
+            Dieses Programm nutzt Bibliotheken von Drittanbietern. Diese sind im Folgenden aufgelistet. Besonderen Dank an die Entwickler dieser Bibliotheken.
             </TextBlock>
         </Grid>
 
