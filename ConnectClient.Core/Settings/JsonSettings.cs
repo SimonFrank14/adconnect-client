@@ -12,6 +12,9 @@ namespace ConnectClient.Core.Settings
         [JsonProperty("ldap")]
         public LdapSettings Ldap { get; set; } = new LdapSettings();
 
+        [JsonProperty("interal_id")]
+        public string UniqueIdAttributeName { get; set; }
+
         [JsonProperty("organizational_units")]
         public string[] OrganizationalUnits { get; set; } = [];
 

@@ -24,7 +24,13 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <GroupBox Header="Single Sign-On Einstellungen" Grid.Row="1">
+                <GroupBox Header="Allgemeine Einstellungen">
+                    <ComboBox ui:ControlHelper.Header="Art des Benutzernamens"
+                                  ItemsSource="{Binding LdapUsernameProperties}"
+                                  SelectedItem="{Binding LdapUsernameProperty, Mode=TwoWay}" />
+                </GroupBox>
+
+                <GroupBox Header="IDP Einstellungen" Grid.Row="1">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
